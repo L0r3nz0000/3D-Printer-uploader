@@ -10,12 +10,9 @@ import psutil
 def get_human_readable_size(size_bytes):
   return psutil._common.bytes2human(size_bytes)
 
-def get_local_ip():
-  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-  s.connect(("8.8.8.8", 80))
-  addr = s.getsockname()[0]
-  s.close()
-  return addr
+def get_models():
+  base_path = 'models/'
+  return [f for f in os.listdir(base_path) if os.path.isfile(os.path.join(base_path, f)) and f.endswith('.gcode')]
 
 UPLOAD_FOLDER = 'models/'
 ALLOWED_EXTENSIONS = {"stl", "obj", "3mf", "amf", "ply", "wrl", "fbx", "dae", "gcode"}
@@ -32,19 +29,35 @@ def allowed_file(filename):
 def monitor():
   return "printing..."
 
-@app.route('/print/<file>', methods=['GET'])
-def print(file):
-  filename = secure_filename(file)
-  gcode_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-  
-  if gcode_path.endswith('.gcode'):
-    if os.path.exists(gcode_path):
-      gcode_sender.send(gcode_path, PORT)  # Inizia la stampa
-      return redirect('/monitor')
-    else:
-      return f"<html><h1>File: \"{gcode_path}\" not found</h1></html>"
+@app.route('/remove/<int:id>', methods=['POST'])
+def remove(id):
+  models = get_models()
+  if id <= len(models) and id > 0:
+    filename = models[id-1]
+    path = os.path.join('models/', filename)
+    os.remove(path)
+    return redirect('/')
   else:
-    return f"<html><h1>File: \"{file}\" is not a gcode</h1></html>"
+    return render_template('error.html', error_code="Parameter ID out of range")
+
+@app.route('/print/<int:id>', methods=['POST'])
+def print(id):
+  models = get_models()
+  if id <= len(models) and id > 0:
+    filename = models[id-1]
+
+    gcode_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    
+    if gcode_path.endswith('.gcode'):
+      if os.path.exists(gcode_path):
+        gcode_sender.send(gcode_path, PORT)  # Inizia la stampa
+        #return redirect('/monitor')
+      else:
+        return f"<html><h1>File: \"{gcode_path}\" not found</h1></html>"
+    else:
+      return f"<html><h1>File: \"{filename}\" is not a gcode</h1></html>"
+  else:
+    return render_template('error.html', error_code="Parameter ID out of range")
 
   
 @app.route('/', methods=['GET', 'POST'])
@@ -70,18 +83,12 @@ def upload_file():
 
   if request.method == 'GET':
     base_path = 'models/'
-    files = [f for f in os.listdir(base_path) if os.path.isfile(os.path.join(base_path, f)) and f.endswith('.gcode')]
+    files = get_models()
 
-    data = [
-      {'name': 1, 'name': 'Mario Rossi'},
-      {'name': 2, 'name': 'Luca Bianchi'},
-      {'name': 3, 'name': 'Giulia Verdi'},
-    ]
     data = []
-    
-    for file in files:
+    for i, file in enumerate(files):
       bytes_size = os.path.getsize(os.path.join(base_path, file))
-      data.append({'name': file, 'size': get_human_readable_size(bytes_size)})
+      data.append({'id': i+1, 'name': file, 'size': get_human_readable_size(bytes_size)})
 
     return render_template('index.html', data=data)
 
