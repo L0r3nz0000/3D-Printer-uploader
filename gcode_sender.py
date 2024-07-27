@@ -1,7 +1,7 @@
 import serial
 import time
 
-def send_gcode(file_path, port, baud_rate=115200):
+def send(file_path, port, baud_rate=115200):
   try:
     # Apre la connessione seriale
     ser = serial.Serial(port, baud_rate)
@@ -31,5 +31,3 @@ def send_gcode(file_path, port, baud_rate=115200):
       
   except Exception as e:
     print(f"Errore: {e}")
-
-send_gcode('models/Chain_Guide.gcode', '/dev/ttyUSB0')

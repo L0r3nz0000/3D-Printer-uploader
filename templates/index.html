@@ -1,9 +1,45 @@
 <!doctype html>
-<html>
-  <title>Upload your model</title>
-  <h1>Upload new File</h1>
-  <form method=post enctype=multipart/form-data>
-    <input type=file name=file>
-    <input type=submit value=Upload>
-  </form>
+<html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>3D Printer uploader</title>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+  </head>
+
+  <div class="container mt-5">
+    <h1 class="mb-4">Carica un modello</h1>
+    <form method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Scegli un file</label>
+            <input type="file" class="form-control-file" id="file" name="file">
+        </div>
+        <button type="submit" class="btn btn-primary">Carica</button>
+    </form>
+  </div>
+  
+  <body>
+      <div class="container">
+          <h1 class="mt-4">Modelli stampabili</h1>
+          <table class="table table-bordered">
+              <thead>
+                  <tr>
+                      <th>Nome file</th>
+                      <th>Dimensione</th>
+                      <th></th>
+                  </tr>
+              </thead>
+              <tbody>
+                  <!-- Loop attraverso i dati passati dal backend -->
+                  {% for row in data %}
+                  <tr>
+                      <td>{{ row.name }}</td>
+                      <td>{{ row.size }}</td>
+                      <td><button class="btn btn-primary">Stampa</button></td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
+      </div>
+  </body>
 </html>

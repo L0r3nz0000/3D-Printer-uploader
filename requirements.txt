@@ -1,2 +1,3 @@
-pip install pyserial
-pip install flask
+pyserial
+flask
+psutil
