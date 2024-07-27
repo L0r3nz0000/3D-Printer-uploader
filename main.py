@@ -6,7 +6,7 @@ import time
 
 UPLOAD_FOLDER = 'models/'
 ALLOWED_EXTENSIONS = {"stl", "obj", "3mf", "amf", "ply", "wrl", "fbx", "dae", "gcode"}
-PORT = '/dev/ttyUSB0' # da cambiare
+PORT = '/dev/ttyUSB0' # porta seriale stampante
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
