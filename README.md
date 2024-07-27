@@ -1,6 +1,6 @@
 # 3D-Printer-uploader
 ## TODO
-- [+] Provare a stampare con un .gcode funzionante
+- [x] Provare a stampare con un .gcode funzionante
 - [ ] Sistemare l'interfaccia web
 - [ ] Creare una pagina per listare tutti i file caricati e stampare quello che si vuole
 - [ ] Automatizzare lo slicing per stampare anche da smartphone
