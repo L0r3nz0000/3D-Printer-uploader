@@ -3,6 +3,14 @@ from flask import Flask, flash, request, redirect, render_template
 from werkzeug.utils import secure_filename
 import serial
 import time
+import socket
+
+def get_local_ip():
+  s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+  s.connect(("8.8.8.8", 80))
+  addr = s.getsockname()[0]
+  s.close()
+  return addr
 
 UPLOAD_FOLDER = 'models/'
 ALLOWED_EXTENSIONS = {"stl", "obj", "3mf", "amf", "ply", "wrl", "fbx", "dae", "gcode"}
@@ -79,3 +87,6 @@ def upload_file():
       file.save(path)
       return render_template('success.html', path=path)
   return render_template('index.html')
+
+if __name__ == "__main__":
+  app.run(host="0.0.0.0")
