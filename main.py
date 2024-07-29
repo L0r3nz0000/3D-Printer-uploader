@@ -51,7 +51,7 @@ def print(id):
     if gcode_path.endswith('.gcode'):
       if os.path.exists(gcode_path):
         gcode_sender.send(gcode_path, PORT)  # Inizia la stampa
-        #return redirect('/monitor')
+        return redirect('/')
       else:
         return f"<html><h1>File: \"{gcode_path}\" not found</h1></html>"
     else:
