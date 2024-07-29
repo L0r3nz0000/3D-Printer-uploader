@@ -10,11 +10,11 @@ import psutil
 def get_human_readable_size(size_bytes):
   return psutil._common.bytes2human(size_bytes)
 
-def get_models():
-  base_path = 'models/'
-  return [f for f in os.listdir(base_path) if os.path.isfile(os.path.join(base_path, f)) and f.endswith('.gcode')]
+UPLOAD_FOLDER = './3D-Printer-uploader/models/'
 
-UPLOAD_FOLDER = 'models/'
+def get_models():
+  return [f for f in os.listdir(UPLOAD_FOLDER) if os.path.isfile(os.path.join(UPLOAD_FOLDER, f)) and f.endswith('.gcode')]
+
 ALLOWED_EXTENSIONS = {"stl", "obj", "3mf", "amf", "ply", "wrl", "fbx", "dae", "gcode"}
 PORT = '/dev/ttyUSB0' # porta seriale stampante
 
@@ -34,7 +34,7 @@ def remove(id):
   models = get_models()
   if id <= len(models) and id > 0:
     filename = models[id-1]
-    path = os.path.join('models/', filename)
+    path = os.path.join(UPLOAD_FOLDER, filename)
     os.remove(path)
     return redirect('/')
   else:
@@ -77,17 +77,16 @@ def upload_file():
     
     if file and allowed_file(file.filename):
       filename = secure_filename(file.filename)
-      path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+      path = os.path.join(UPLOAD_FOLDER, filename)
       file.save(path)
     
 
   if request.method == 'GET':
-    base_path = 'models/'
     files = get_models()
 
     data = []
     for i, file in enumerate(files):
-      bytes_size = os.path.getsize(os.path.join(base_path, file))
+      bytes_size = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
       data.append({'id': i+1, 'name': file, 'size': get_human_readable_size(bytes_size)})
 
     return render_template('index.html', data=data)
