@@ -1,10 +1,11 @@
 import os
-from flask import Flask, flash, request, redirect, render_template
+from flask import Flask, flash, request, redirect, render_template, url_for
 from werkzeug.utils import secure_filename
 import time
 import socket
 from _3d_printer import Printer
 import psutil
+#from celery import Celery
 
 # Funzione per ottenere la dimensione in formato leggibile
 def get_human_readable_size(size_bytes):
@@ -21,6 +22,13 @@ PORT = '/dev/ttyUSB0' # porta seriale stampante
 printer = Printer(PORT)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+# Configurazione di Celery
+#app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
+#app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+
+#celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
+#celery.conf.update(app.config)
 
 def allowed_file(filename):
   return '.' in filename and \

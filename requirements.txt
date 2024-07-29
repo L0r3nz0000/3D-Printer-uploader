@@ -1,3 +1,5 @@
 pyserial
-flask
+Flask
+Celery
+redis
 psutil

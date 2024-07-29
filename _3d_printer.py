@@ -13,7 +13,7 @@ class Printer:
     self.completed = False
 
   def get_percentage(self):
-    return str(self.percentage)+"%"
+    return str(self.percentage)#+"%"
   
   def stop_print(self):
     self.ser.write("M112\n".encode()) # Invia il comando di stop forzato
@@ -23,7 +23,7 @@ class Printer:
     self.ser.write("G28\n".encode())  # Invia il comando di auto home
     response = self.ser.readline().decode().strip()
     print(f"Risposta: {response}")
-    
+
     self.ser.close()
 
   def start_print(self, file_path):
