@@ -79,7 +79,7 @@ def upload_file():
       filename = secure_filename(file.filename)
       path = os.path.join(UPLOAD_FOLDER, filename)
       file.save(path)
-    
+      return redirect('/')
 
   if request.method == 'GET':
     files = get_models()
