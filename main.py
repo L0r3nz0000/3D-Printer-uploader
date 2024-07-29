@@ -3,10 +3,10 @@ from flask import Flask, flash, request, redirect, render_template
 from werkzeug.utils import secure_filename
 import time
 import socket
-import gcode_sender
+from _3d_printer import Printer
 import psutil
 
-# Funzione per ottenere dimensione leggibile
+# Funzione per ottenere la dimensione in formato leggibile
 def get_human_readable_size(size_bytes):
   return psutil._common.bytes2human(size_bytes)
 
@@ -18,6 +18,7 @@ def get_models():
 ALLOWED_EXTENSIONS = {"stl", "obj", "3mf", "amf", "ply", "wrl", "fbx", "dae", "gcode"}
 PORT = '/dev/ttyUSB0' # porta seriale stampante
 
+printer = Printer(PORT)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -25,9 +26,17 @@ def allowed_file(filename):
   return '.' in filename and \
     filename.split('.')[-1].lower() in ALLOWED_EXTENSIONS
 
+@app.route('/get_percentage', methods=['GET'])
+def get_percentage():
+  return printer.get_percentage() if not printer.completed else "Completed"
+
 @app.route('/monitor', methods=['GET', 'POST'])
 def monitor():
-  return "printing..."
+  return render_template('monitor.html')
+
+@app.route('/stop', methods=['POST'])
+def stop():
+  printer.stop_print()
 
 @app.route('/remove/<int:id>', methods=['POST'])
 def remove(id):
@@ -46,12 +55,12 @@ def print(id):
   if id <= len(models) and id > 0:
     filename = models[id-1]
 
-    gcode_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+    gcode_path = os.path.join(UPLOAD_FOLDER, filename)
     
     if gcode_path.endswith('.gcode'):
       if os.path.exists(gcode_path):
-        gcode_sender.send(gcode_path, PORT)  # Inizia la stampa
-        return redirect('/')
+        printer.start_print(gcode_path)  # Inizia la stampa
+        return redirect('/monitor')
       else:
         return f"<html><h1>File: \"{gcode_path}\" not found</h1></html>"
     else:
