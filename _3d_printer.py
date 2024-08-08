@@ -6,9 +6,14 @@ class Printer:
     self.port = port
     self.baud_rate = baud_rate
 
-    # Apre la connessione seriale
-    self.ser = serial.Serial(port, baud_rate)
-    
+    # Prova ad aprire la connessione seriale
+    try:
+      self.ser = serial.Serial(port, baud_rate)
+      self.connected = True
+    except:
+      self.ser = None
+      self.connected = False
+
     self.percentage = 0.000
     self.completed = False
 
@@ -27,6 +32,15 @@ class Printer:
     self.ser.close()
 
   def start_print(self, file_path):
+    if not self.connected:  # Aspetta che avvenga una connessione seriale
+      try:
+        self.ser = serial.Serial(self.port, self.baud_rate)
+        self.connected = True
+      except:
+        self.ser = None
+        self.connected = False
+        return 1
+    
     try:
       print(f"Connesso alla porta {self.port} con baud rate {self.baud_rate}")
       

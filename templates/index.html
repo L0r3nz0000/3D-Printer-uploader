@@ -21,18 +21,12 @@
           <button type="submit" class="btn btn-primary">Carica</button>
       </form>
   </div>
-
-  <style>
-    /* Stile pulsante play */
-    .btn-custom-green {
-      background-color: #28a745; /* Colore verde Bootstrap */
-      border-color: #28a745; /* Bordo verde Bootstrap */
-    }
-    .btn-custom-green:hover {
-      background-color: #218838; /* Verde scuro per hover */
-      border-color: #1e7e34; /* Bordo verde scuro */
-    }
-  </style>
+  
+  {% if is_admin %}
+    <div class="text-center mt-3">
+        <a href="{{ url_for('users') }}" class="btn btn-secondary">Manage Users</a>
+    </div>
+  {% endif %}
 
   <div class="container mt-5">
     <h1 class="mt-4">Stampa un modello</h1>

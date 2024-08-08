@@ -1,17 +1,21 @@
 import os
-from flask import Flask, flash, request, redirect, render_template, url_for
+from flask import Flask, flash, request, redirect, render_template, session
+from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from models import db, User
+from sqlalchemy.exc import IntegrityError
+from flask_wtf.csrf import CSRFProtect
+from forms import LoginForm, RegistrationForm, PermissionForm
 import time
 import socket
-from _3d_printer import Printer
 import psutil
-#from celery import Celery
+from _3d_printer import Printer
 
 # Funzione per ottenere la dimensione in formato leggibile
 def get_human_readable_size(size_bytes):
   return psutil._common.bytes2human(size_bytes)
 
-UPLOAD_FOLDER = './3D-Printer-uploader/models/'
+UPLOAD_FOLDER = './models/'
 
 def get_models():
   return [f for f in os.listdir(UPLOAD_FOLDER) if os.path.isfile(os.path.join(UPLOAD_FOLDER, f)) and f.endswith('.gcode')]
@@ -22,13 +26,15 @@ PORT = '/dev/ttyUSB0' # porta seriale stampante
 printer = Printer(PORT)
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['SECRET_KEY'] = 'my_secret_key'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
-# Configurazione di Celery
-#app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379/0'
-#app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379/0'
+csrf = CSRFProtect(app)
 
-#celery = Celery(app.name, broker=app.config['CELERY_BROKER_URL'])
-#celery.conf.update(app.config)
+db.init_app(app)
 
 def allowed_file(filename):
   return '.' in filename and \
@@ -53,7 +59,7 @@ def remove(id):
     filename = models[id-1]
     path = os.path.join(UPLOAD_FOLDER, filename)
     os.remove(path)
-    return redirect('/')
+    return redirect('/home')
   else:
     return render_template('error.html', error_code="Parameter ID out of range")
 
@@ -67,8 +73,10 @@ def print(id):
     
     if gcode_path.endswith('.gcode'):
       if os.path.exists(gcode_path):
-        printer.start_print(gcode_path)  # Inizia la stampa
-        return redirect('/monitor')
+        if not printer.start_print(gcode_path):  # Inizia la stampa
+          return redirect('/monitor')
+        else:
+          return render_template('error.html', error_code="Errore nel collegamento alla stampante")
       else:
         return f"<html><h1>File: \"{gcode_path}\" not found</h1></html>"
     else:
@@ -76,9 +84,77 @@ def print(id):
   else:
     return render_template('error.html', error_code="Parameter ID out of range")
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+  form = RegistrationForm()
+  if form.validate_on_submit():
+    hashed_password = generate_password_hash(form.password.data, method='pbkdf2:sha256')
+    new_user = User(username=form.username.data, password=hashed_password)
+
+    try:
+      db.session.add(new_user)
+      db.session.commit()
+      flash('Registration successful! You can now log in.', 'success')
+      return redirect('/login')
+    except IntegrityError:
+      db.session.rollback()  # Rollback the session to avoid corruption
+      flash('Username already exists. Please choose a different username.', 'danger')
+
+  return render_template('register.html', form=form)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+  form = LoginForm(request.form)
+  if request.method == 'POST':
+    if form.validate_on_submit():
+      user = User.query.filter_by(username=form.username.data).first()
+      if user and check_password_hash(user.password, form.password.data):
+        session['user_id'] = user.id
+        session['is_admin'] = user.is_admin
+        flash('Login successful!', 'success')
+        return redirect('/home')
+      else:
+        flash('Invalid username or password', 'danger')
+    else:
+      flash(f'Invalid parameters: {form.errors}', 'danger')
   
+  return render_template('login.html', form=form)
+
+@app.route('/users', methods=['GET', 'POST'])
+def users():
+  if not session.get('is_admin'):
+    flash('You do not have access to this page.', 'danger')
+    return redirect('/home')
+  
+  users = User.query.all()
+  
+  if request.method == 'POST':
+    user_id = request.form.get('user_id')
+    user = User.query.get(user_id)
+    
+    if user:
+      user.can_print = 'can_print' in request.form
+      user.can_upload = 'can_upload' in request.form
+      user.can_view = 'can_view' in request.form
+      db.session.commit()
+      flash(f'Permissions updated for {user.username}', 'success')
+  
+  return render_template('users.html', users=users)
+
+@app.route('/logout')
+def logout():
+  session.pop('user_id', None)
+  session.pop('is_admin', None)
+  flash('You have been logged out.', 'success')
+  return redirect('/login')
+
 @app.route('/', methods=['GET', 'POST'])
-def upload_file():
+@app.route('/home', methods=['GET', 'POST'])
+def home():
+  #return "user id: " + session['user_id']
+  if 'user_id' not in session:
+    return redirect('/login')
+
   if request.method == 'POST':
     # controlla se nella post c'è il file
     if 'file' not in request.files:
@@ -96,7 +172,7 @@ def upload_file():
       filename = secure_filename(file.filename)
       path = os.path.join(UPLOAD_FOLDER, filename)
       file.save(path)
-      return redirect('/')
+      return redirect('/home')
 
   if request.method == 'GET':
     files = get_models()
@@ -106,7 +182,7 @@ def upload_file():
       bytes_size = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
       data.append({'id': i+1, 'name': file, 'size': get_human_readable_size(bytes_size)})
 
-    return render_template('index.html', data=data)
+    return render_template('index.html', data=data, is_admin=session.get('is_admin'))
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0")

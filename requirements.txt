@@ -3,3 +3,5 @@ Flask
 Celery
 redis
 psutil
+flask-sqlalchemy
+flask-wtf
