@@ -6,16 +6,28 @@
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <div class="row justify-content-center mt-5">
-            <div class="col-md-4">
-                <h3 class="text-center">Register</h3>
-                
+
+<style>
+    .box {
+        border: 1px solid #464646; /* Colore del bordo per il tema scuro */
+        padding: 40px; /* Spaziatura interna per migliorare l'aspetto */
+        padding-top: 60px;
+        padding-bottom: 60px;
+        border-radius: 10px; /* Angoli arrotondati opzionali */
+    }
+</style>
+
+<body class="bg-dark text-white">
+    <div class="container vh-100 d-flex align-items-center justify-content-center">
+        <div class="row justify-content-center w-100">
+            <div class="col-md-4 box">
+                <h3 class="text-center mb-4">Register</h3>
+
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
-                    <div class="alert alert-{{ messages[0][0] }}" id="flash-message">
+                    <div class="alert alert-{{ messages[0][0] }} alert-dismissible fade show" id="flash-message" data-bs-theme="dark">
                         {{ messages[0][1] }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                     {% endif %}
                 {% endwith %}
@@ -31,30 +43,32 @@
                         }, 500); // Rimuove il messaggio dopo la dissolvenza
                       }
                     }, 3000);
-                  </script>
+                </script>
                 
                 <form method="POST" action="{{ url_for('register') }}">
                     {{ form.hidden_tag() }}
-                    <div class="mb-3">
-                        {{ form.username.label(class="form-label") }}
-                        {{ form.username(class="form-control") }}
+                    <div class="form-floating mb-3" data-bs-theme="dark">
+                        {{ form.username(class="form-control bg-dark text-white", placeholder="Username") }}
+                        {{ form.username.label(class="form-label text-white", style="margin-left: 12px;") }}
                     </div>
-                    <div class="mb-3">
-                        {{ form.password.label(class="form-label") }}
-                        {{ form.password(class="form-control") }}
+                    <div class="form-floating mb-3" data-bs-theme="dark">
+                        {{ form.password(class="form-control bg-dark text-white", placeholder="Password") }}
+                        {{ form.password.label(class="form-label text-white", style="margin-left: 12px;") }}
                     </div>
-                    <div class="mb-3">
-                        {{ form.confirm_password.label(class="form-label") }}
-                        {{ form.confirm_password(class="form-control") }}
+                    <div class="form-floating mb-3" data-bs-theme="dark">
+                        {{ form.confirm_password(class="form-control bg-dark text-white", placeholder="Confirm Password") }}
+                        {{ form.confirm_password.label(class="form-label text-white", style="margin-left: 12px;") }}
                     </div>
-                    {{ form.submit(class="btn btn-primary w-100") }}
+                    {{ form.submit(class="btn btn-outline-light w-100 mt-4") }}
                 </form>
 
                 <div class="text-center mt-3">
-                    <p>Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none">Login</a></p>
+                    <p>Already have an account? <a href="{{ url_for('login') }}" class="text-decoration-none text-white">Login</a></p>
                 </div>
             </div>
         </div>
     </div>
+    <!-- Script di Bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -6,16 +6,16 @@
     <title>Users</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="bg-dark text-white">
     <!-- Navbar -->
-    <nav class="navbar navbar-light bg-light">
+    <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
             <!-- Home button -->
             <a class="navbar-brand" href="{{ url_for('home') }}">Home</a>
 
             <!-- Right-aligned content -->
             <div class="d-flex">
-                <a href="{{ url_for('logout') }}" class="btn btn-secondary">Logout</a>
+                <a href="{{ url_for('logout') }}" class="btn btn-outline-light">Logout</a>
             </div>
         </div>
     </nav>
@@ -24,8 +24,9 @@
     <div class="container mt-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
-                <div class="alert alert-{{ messages[0][0] }}" id="flash-message">
+                <div class="alert alert-{{ messages[0][0] }} alert-dismissible fade show" id="flash-message" data-bs-theme="dark">
                 {{ messages[0][1] }}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             {% endif %}
         {% endwith %}
@@ -42,9 +43,10 @@
                 }, 500); // Rimuove il messaggio dopo la dissolvenza
               }
             }, 3000);
-          </script>
+        </script>
+        
         <h1 class="text-center">User Management</h1>
-        <table class="table table-bordered mt-3">
+        <table class="table table-dark table-striped table-bordered mt-3">
             <thead>
                 <tr>
                     <th>Username</th>
@@ -64,26 +66,26 @@
                         <form method="POST" action="{{ url_for('users') }}">
                             {{ form.hidden_tag() }}
                             <td>
-                                <input type="checkbox" name="is_admin" {% if user.is_admin %}checked{% endif %}>
+                                <input type="checkbox" name="is_admin" {% if user.is_admin %}checked{% endif %} class="form-check-input">
                             </td>
                             <td>
-                                <input type="checkbox" name="can_print" {% if user.can_print %}checked{% endif %}>
+                                <input type="checkbox" name="can_print" {% if user.can_print %}checked{% endif %} class="form-check-input">
                             </td>
                             <td>
-                                <input type="checkbox" name="can_upload" {% if user.can_upload %}checked{% endif %}>
+                                <input type="checkbox" name="can_upload" {% if user.can_upload %}checked{% endif %} class="form-check-input">
                             </td>
                             <td>
-                                <input type="checkbox" name="can_view" {% if user.can_view %}checked{% endif %}>
+                                <input type="checkbox" name="can_view" {% if user.can_view %}checked{% endif %} class="form-check-input">
                             </td>
                             <td>
-                                <input type="checkbox" name="can_delete" {% if user.can_delete %}checked{% endif %}>
+                                <input type="checkbox" name="can_delete" {% if user.can_delete %}checked{% endif %} class="form-check-input">
                             </td>
                             <td>
-                                <input type="checkbox" name="can_stop" {% if user.can_stop %}checked{% endif %}>
+                                <input type="checkbox" name="can_stop" {% if user.can_stop %}checked{% endif %} class="form-check-input">
                             </td>
                             <td>
                                 <input type="hidden" name="user_id" value="{{ user.id }}">
-                                <button type="submit" class="btn btn-primary">Update</button>
+                                <button type="submit" class="btn btn-outline-light">Update</button>
                             </td>
                         </form>
                     </tr>

@@ -57,25 +57,32 @@ def stop():
   if session.get('can_stop'):
     printer.stop_print()
   else:
-    return render_template('error.html', error_message='You are not allowed to interrupt the current print')
+    flash('You are not allowed to interrupt the current print', 'danger')
+    return redirect(url_for('home'))
 
 @app.route('/remove/<int:id>', methods=['POST'])
 @csrf.exempt
 def remove(id):
-  models = get_models()
-  if id <= len(models) and id > 0:
-    filename = models[id-1]
-    path = os.path.join(UPLOAD_FOLDER, filename)
-    os.remove(path)
-    return redirect('/home')
+  if session.get('can_delete'):
+    models = get_models()
+    if id <= len(models) and id > 0:
+      filename = models[id-1]
+      path = os.path.join(UPLOAD_FOLDER, filename)
+      os.remove(path)
+      return redirect('/home')
+    else:
+      flash('Parameter ID out of range', 'danger')
+      return redirect(url_for('home'))
   else:
-    return render_template('error.html', error_message='Parameter ID out of range')
+    flash('You are not allowed to remove models', 'danger')
+    return redirect(url_for('home'))
 
 @app.route('/print/<int:id>', methods=['POST'])
 @csrf.exempt
 def print(id):
   if not session.get('can_print'):
-    return render_template('error.html', error_message='You are not allowed to start a print!')
+    flash('You are not allowed to start a print', 'danger')
+    return redirect(url_for('home'))
   
   models = get_models()
   if id <= len(models) and id > 0:
@@ -86,15 +93,19 @@ def print(id):
     if gcode_path.endswith('.gcode'):
       if os.path.exists(gcode_path):
         if not printer.start_print(gcode_path):  # Inizia la stampa
-          return redirect('/monitor')
+          return redirect(url_for('monitor'))
         else:
-          return render_template('error.html', error_message='Errore nel collegamento alla stampante')
+          flash('Controlla il collegamento con la stampante e riprova', 'warning')
+          return redirect(url_for('home'))
       else:
-        return f"<html><h1>File: \"{gcode_path}\" not found</h1></html>"
+        flash(f'File: {gcode_path} not found', 'danger')
+        return redirect(url_for('home'))
     else:
-      return f"<html><h1>File: \"{filename}\" is not a gcode</h1></html>"
+      flash(f'File: {gcode_path} is not a gcode', 'danger')
+      return redirect(url_for('home'))
   else:
-    return render_template('error.html', error_message="Parameter ID out of range")
+    flash('Parameter ID out of range', 'danger')
+    return redirect(url_for('home'))
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -120,6 +131,7 @@ def login():
   if request.method == 'POST':
     if form.validate_on_submit():
       user = User.query.filter_by(username=form.username.data).first()
+
       if user and check_password_hash(user.password, form.password.data):
         session['user_id'] = user.id
         session['is_admin'] = user.is_admin
@@ -169,17 +181,18 @@ def logout():
 @app.route('/upload', methods=['POST'])
 def upload():
   if not session.get('can_upload'):
-    return render_template('error.html', error_message='User not allowed to load models')
+    flash('User not allowed to load models', 'danger')
+    return redirect(url_for('home'))
   # controlla se nella post c'è il file
   if 'file' not in request.files:
-    flash('No file part')
+    flash('No file part', 'warning')
     return redirect(url_for('home'))
   file = request.files['file']
 
   # se l'utente non sceglie un file, il browser
   # carica un file vuoto senza nome.
   if file.filename == '':
-    flash('No selected file')
+    flash('No selected file', 'warning')
     return redirect(request.url)
   
   if file and allowed_file(file.filename):
