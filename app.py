@@ -137,6 +137,7 @@ def users():
     flash('You do not have access to this page.', 'danger')
     return redirect('/home')
   
+  form = PermissionForm()
   users = User.query.all()
   
   if request.method == 'POST':
@@ -144,14 +145,16 @@ def users():
     user = User.query.get(user_id)
     
     if user:
+      user.is_admin = 'is_admin' in request.form
       user.can_print = 'can_print' in request.form
       user.can_upload = 'can_upload' in request.form
       user.can_view = 'can_view' in request.form
       user.can_delete = 'can_delete' in request.form
+      user.can_stop = 'can_stop' in request.form
       db.session.commit()
       flash(f'Permissions updated for {user.username}', 'success')
   
-  return render_template('users.html', users=users)
+  return render_template('users.html', users=users, form=form)
 
 @app.route('/logout')
 def logout():
@@ -192,13 +195,14 @@ def home():
 
   files = get_models()
   upload_form = UploadForm()
+  user = User.query.get(session['user_id'])
 
   data = []
   for i, file in enumerate(files):
     bytes_size = os.path.getsize(os.path.join(UPLOAD_FOLDER, file))
     data.append({'id': i+1, 'name': file, 'size': get_human_readable_size(bytes_size)})
 
-  return render_template('home.html', form=upload_form, data=data, is_admin=session.get('is_admin'))
+  return render_template('home.html', user=user, form=upload_form, data=data, is_admin=session.get('is_admin'))
 
 if __name__ == "__main__":
   app.run(host="0.0.0.0")

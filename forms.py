@@ -14,9 +14,12 @@ class RegistrationForm(FlaskForm):
   submit = SubmitField('Register')
 
 class PermissionForm(FlaskForm):
+  is_admin = BooleanField('Is Admin')
   can_print = BooleanField('Can Print')
   can_upload = BooleanField('Can Upload')
   can_view = BooleanField('Can View')
+  can_delete = BooleanField('Can Delete')
+  can_stop = BooleanField('Can Stop')
   submit = SubmitField('Update Permissions')
 
 class UploadForm(FlaskForm):

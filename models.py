@@ -11,6 +11,7 @@ class User(db.Model):
   can_upload = db.Column(db.Boolean, default=False)
   can_view = db.Column(db.Boolean, default=False)
   can_delete = db.Column(db.Boolean, default=False)
+  can_stop = db.Column(db.Boolean, default=False)
 
   def __repr__(self):
     return f'<User {self.username}>'
