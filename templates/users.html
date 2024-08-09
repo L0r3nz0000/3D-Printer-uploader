@@ -23,12 +23,26 @@
     <!-- Main content -->
     <div class="container mt-5">
         {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-              <div class="alert alert-{{ messages[0][0] }}">
-                  {{ messages[0][1] }}
-              </div>
-          {% endif %}
+            {% if messages %}
+                <div class="alert alert-{{ messages[0][0] }}" id="flash-message">
+                {{ messages[0][1] }}
+                </div>
+            {% endif %}
         {% endwith %}
+
+        <script>
+            // Script per nascondere il messaggio flash dopo 3 secondi (3000 ms)
+            setTimeout(function() {
+              var flashMessage = document.getElementById('flash-message');
+              if (flashMessage) {
+                flashMessage.style.transition = "opacity 0.5s ease-out"; // Effetto dissolvenza
+                flashMessage.style.opacity = 0;
+                setTimeout(function() {
+                  flashMessage.remove();
+                }, 500); // Rimuove il messaggio dopo la dissolvenza
+              }
+            }, 3000); // 3000 ms = 3 secondi
+          </script>
         <h1 class="text-center">User Management</h1>
         <table class="table table-bordered mt-3">
             <thead>
