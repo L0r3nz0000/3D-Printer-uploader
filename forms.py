@@ -18,3 +18,6 @@ class PermissionForm(FlaskForm):
   can_upload = BooleanField('Can Upload')
   can_view = BooleanField('Can View')
   submit = SubmitField('Update Permissions')
+
+class UploadForm(FlaskForm):
+  submit = SubmitField('Upload file')

@@ -10,6 +10,7 @@ class User(db.Model):
   can_print = db.Column(db.Boolean, default=False)
   can_upload = db.Column(db.Boolean, default=False)
   can_view = db.Column(db.Boolean, default=False)
+  can_delete = db.Column(db.Boolean, default=False)
 
   def __repr__(self):
     return f'<User {self.username}>'
