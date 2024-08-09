@@ -54,7 +54,10 @@ def monitor():
 
 @app.route('/stop', methods=['POST'])
 def stop():
-  printer.stop_print()
+  if session.get('can_stop'):
+    printer.stop_print()
+  else:
+    return render_template('error.html', error_message='You are not allowed to interrupt the current print')
 
 @app.route('/remove/<int:id>', methods=['POST'])
 @csrf.exempt
