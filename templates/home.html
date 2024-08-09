@@ -50,16 +50,20 @@
           }
         }, 2000);
       </script>
-      <h1 class="mb-4">Upload your model</h1>
-      <form method="post" enctype="multipart/form-data" action="/upload">
-          {{ form.hidden_tag() }}
-          <div class="form-group">
-              <input type="file" class="form-control-file" id="file" name="file">
-          </div>
-          <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
+
+      {% if user.can_upload %}
+        <h1 class="mb-4">Upload your model</h1>
+        <form method="post" enctype="multipart/form-data" action="/upload">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <input type="file" class="form-control-file" id="file" name="file">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      {% endif %}
   </div>
 
+  {% if user.can_view %}
   <div class="container mt-5">
     <h1 class="mt-4">Print a model</h1>
     <table class="table table-bordered">
@@ -138,5 +142,6 @@
       </tbody>
     </table>
   </div>
+  {% endif %}
 </body>
 </html>
