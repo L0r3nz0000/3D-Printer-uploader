@@ -4,7 +4,7 @@
 - [x] Rifare l'interfaccia web usando bootstrap
 - [x] Creare una pagina per listare tutti i file caricati e stampare quello che si vuole
 - [x] Form di login con gestione dei permessi (stampa, caricare modelli, visualizzare modelli)
-- [ ] Correggere permessi di view e upload (sia front-end che back-end)
+- [x] Correggere permessi di view e upload (sia front-end che back-end)
 - [ ] Rendere il processo di stampa asincrono in modo da poterlo controllare da un'interfaccia web
 - [ ] Automatizzare lo slicing per stampare anche da smartphone
 - [ ] Caricare e stampare file da Thingiverse e Cults
