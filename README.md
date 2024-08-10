@@ -1,5 +1,12 @@
 # 3D-Printer-uploader
+### Login
 ![login](/screenshots/login.png)
+### Home
+![home](/screenshots/home.png)
+### Print
+![print](/screenshots/print.png)
+### Delete
+![delete](/screenshots/delete.png)
 ## TODO
 - [x] Provare a stampare con un .gcode funzionante
 - [x] Rifare l'interfaccia web usando bootstrap
