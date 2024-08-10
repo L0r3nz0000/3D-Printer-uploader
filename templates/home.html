@@ -64,7 +64,7 @@
                       <input type="file" class="d-none" id="file" name="file" required>
                   </label>
                   <!-- Bottone "Upload" per inviare il file -->
-                  <button type="submit" class="btn btn-outline-light">Upload</button>
+                  <button type="submit" class="btn btn-light">Upload</button>
               </div>
           </div>
         </form>
@@ -110,16 +110,16 @@
           <div class="modal-dialog" role="document">
             <div class="modal-content bg-dark text-white">
               <div class="modal-header">
-                <h5 class="modal-title" id="printModalLabel-{{ row.id }}">Conferma Stampa</h5>
+                <h5 class="modal-title" id="printModalLabel-{{ row.id }}">Confirm print</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                Sei sicuro di voler stampare il file "{{ row.name }}"?
+                Are you sure you want to print the file "{{ row.name }}"?
               </div>
               <div class="modal-footer">
                 <form action="/print/{{ row.id }}" method="post">
-                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
-                  <button type="submit" class="btn btn-outline-success">Avvia</button>
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-outline-success">Start</button>
                 </form>
               </div>
             </div>
@@ -131,16 +131,16 @@
           <div class="modal-dialog" role="document">
             <div class="modal-content bg-dark text-white">
               <div class="modal-header">
-                <h5 class="modal-title" id="deleteModalLabel-{{ row.id }}">Conferma Eliminazione</h5>
+                <h5 class="modal-title" id="deleteModalLabel-{{ row.id }}">Confirm Deletion</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                Sei sicuro di voler eliminare il file "{{ row.name }}"?
+                Are you sure you want to delete the file "{{ row.name }}"?
               </div>
               <div class="modal-footer">
                 <form action="/remove/{{ row.id }}" method="post">
-                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
-                  <button type="submit" class="btn btn-outline-danger">Elimina</button>
+                  <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="submit" class="btn btn-outline-danger">Delete</button>
                 </form>
               </div>
             </div>
